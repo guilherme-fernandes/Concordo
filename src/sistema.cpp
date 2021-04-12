@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -215,6 +216,7 @@ string Sistema::enter_server(const string nome, const string codigo) {
     for (serv = servidores.begin(); serv != servidores.end(); ++serv) {
         if (serv->getNome() == nome && serv->getCodigoConvite() == "") {
             if (serv->testaDono(usuarioLogadoId) == true) {
+                nomeServidorConectado = nome;
                 return "Entrou no servidor com sucesso";
             }
 
@@ -294,7 +296,22 @@ string Sistema::list_participants() {
 }
 
 string Sistema::list_channels() {
-    return "list_channels NÃO IMPLEMENTADO";
+    if (usuarioLogadoId == 0)
+        return "Não há um usuário logado";
+
+    if (nomeServidorConectado == "")
+        return "Não está conectado a um servidor";
+
+    auto serv = servidores.begin();
+
+    for (; serv != servidores.end(); ++serv) {
+        if (nomeServidorConectado == serv->getNome()) {
+            serv->listarCanais();
+            return "";
+        }
+    }
+
+    return "ERRO";
 }
 
 string Sistema::create_channel(const string nome, const string tipo) {
@@ -307,53 +324,151 @@ string Sistema::create_channel(const string nome, const string tipo) {
     auto serv = servidores.begin();
 
     for (; serv != servidores.end(); ++serv) {
-        if (serv->getNome() == nomeServidorConectado && tipo == "texto") {
-            CanalTexto *novo = new CanalTexto(nome);
+        if (serv->getNome() == nomeServidorConectado) {
+            if (tipo == "texto") {
+                shared_ptr<CanalTexto> novo(new CanalTexto(nome));
 
-            if (serv->canalDuplicado(novo)) {
-                cout << "Canal de Texto " << nome << " já existe";
-                return "";
+                if (serv->canalDuplicado(novo)) {
+                    cout << "Canal de Texto " << nome << " já existe";
+                    return "";
+                }
+
+                else {
+                    serv->adicionaCanal(novo);
+                    nomeCanalConectado = nome;
+                    cout << "Canal de Texto " << nome << " criado com sucesso!";
+                    return "";
+                }
+            }
+
+            else if (tipo == "voz") {
+                shared_ptr<CanalVoz> novo(new CanalVoz(nome));
+
+                if (serv->canalDuplicado(novo)) {
+                    cout << "Canal de Voz " << nome << " já existe";
+                    return "";
+                }
+
+                else {
+                    serv->adicionaCanal(novo);
+                    nomeCanalConectado = nome;
+                    cout << "Canal de Voz " << nome << " criado com sucesso!";
+                    return "";
+                }
             }
 
             else {
-                serv->adicionaCanal(novo);
-                cout << "Canal de Texto " << nome << " criado com sucesso!";
-                return "";
+                return "Tipo Desconhecido";
             }
         }
+    }
+    return "ERRO";
+}
 
-        else if (tipo == "voz") {
-            CanalVoz *novo = new CanalVoz(nome);
-            if (serv->canalDuplicado(novo)) {
-                cout << "Canal de Texto " << nome << " já existe";
-                return "";
-            }
+string Sistema::enter_channel(const string nome) {
+    if (usuarioLogadoId == 0)
+        return "Não há um usuário logado";
 
-            else {
-                serv->adicionaCanal(novo);
-                cout << "Canal de Texto " << nome << " criado com sucesso!";
-                return "";
+    if (nomeServidorConectado == "")
+        return "Não está conectado a um servidor";
+
+    auto serv = servidores.begin();
+
+    if (nomeCanalConectado == "") {
+        for (; serv != servidores.end(); serv++) {
+            if (serv->getNome() == nomeServidorConectado) {
+                if (serv->encontraCanal(nome)) {
+                    nomeCanalConectado = nome;
+                    return "";
+                }
+
+                else {
+                    return "Canal não encontrado";
+                }
             }
         }
+    }
+
+    else {
+        return "Já existe um Canal Conectado";
     }
 
     return "ERRO";
 }
 
-string Sistema::enter_channel(const string nome) {
-    return "enter_channel NÃO IMPLEMENTADO";
-}
-
 string Sistema::leave_channel() {
-    return "leave_channel NÃO IMPLEMENTADO";
+    if (usuarioLogadoId == 0)
+        return "Não há um usuário logado";
+
+    if (nomeServidorConectado == "")
+        return "Não está conectado a um servidor";
+
+    if (nomeCanalConectado == "") {
+        return "Não está conectado a um canal";
+    }
+
+    nomeCanalConectado = "";
+    return "Saindo do Canal";
 }
 
 string Sistema::send_message(const string mensagem) {
-    return "send_message NÃO IMPLEMENTADO";
+    if (usuarioLogadoId == 0)
+        return "Não há um usuário logado";
+
+    if (nomeServidorConectado == "")
+        return "Não está conectado a um servidor";
+
+    if (nomeCanalConectado == "") {
+        return "Não está conectado a um canal";
+    }
+    Usuario* remetente = retornaUsuarioPorID(usuarioLogadoId);
+
+    Mensagem nova(usuarioLogadoId, remetente, mensagem);
+
+    auto serv = servidores.begin();
+
+    for (; serv != servidores.end(); ++serv) {
+        if (serv->getNome() == nomeServidorConectado) {
+            serv->adicionaMensagem(nomeCanalConectado, nova);
+            return "Mensagem enviada com sucesso";
+        }
+    }
+
+    return "Servidor não encontrado";
 }
 
 string Sistema::list_messages() {
-    return "list_messages NÃO IMPLEMENTADO";
+    if (usuarioLogadoId == 0)
+        return "Não há um usuário logado";
+
+    if (nomeServidorConectado == "")
+        return "Não está conectado a um servidor";
+
+    if (nomeCanalConectado == "") {
+        return "Não está conectado a um canal";
+    }
+
+    auto serv = servidores.begin();
+
+    for (; serv != servidores.end(); serv++) {
+        if (serv->getNome() == nomeServidorConectado) {
+            serv->listaMensagensCanal(nomeCanalConectado);
+            return "";
+        }
+    }
+
+    return "Servidor não encontrado";
 }
 
-/* IMPLEMENTAR MÉTODOS PARA OS COMANDOS RESTANTES */
+Usuario* Sistema::retornaUsuarioPorID(const int usuarioID) {
+    auto it = usuarios.begin();
+
+    for (; it != usuarios.end(); it++) {
+        if (it->getId() == usuarioID) {
+            return &(*it);
+        }
+    }
+
+    cout << "Usuario não encontrado" << endl;
+    return nullptr;
+}

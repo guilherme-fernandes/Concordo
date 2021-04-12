@@ -1,7 +1,9 @@
 #ifndef SERVIDOR_H
 #define SERVIDOR_H
 
+#include <algorithm>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "canal.h"
@@ -11,9 +13,6 @@
 
 using namespace std;
 
-/*
-ok, boa documentação!
-*/
 /* Classe referente ao Servidor do Concordo */
 class Servidor {
    private:
@@ -30,7 +29,7 @@ class Servidor {
     string codigoConvite;
 
     /* Vector de canais do Servidor */
-    vector<Canal *> canais;
+    vector<shared_ptr<Canal>> canais;
 
     /* Vector que armazena usuários do Servidor */
     vector<int> participantesIDs;
@@ -51,7 +50,7 @@ class Servidor {
     string getDescricao();
     string getCodigoConvite();
     vector<int> getParticipantesIds();
-    vector<Canal *> getCanais();
+    vector<shared_ptr<Canal>> getCanais();
 
     /* Setters */
     void setDescricao(string descricao);
@@ -82,11 +81,48 @@ class Servidor {
     /* Lista os participantes de um servidor */
     void listaParticipantes();
 
-    void adicionaCanal(Canal *canal);
+    /*
+     * @brief Adiciona um novo canal ao vector de canais
+     * @param canal Um ponteiro do Canal à ser adicionado através de um push_back()
+     */
+    void adicionaCanal(shared_ptr<Canal> canal);
 
-    void removeCanal(Canal canal);
+    /*
+     * @brief Remove um Canal da lista de canais
+     * @param canal Um ponteiro do Canal a ser removido da lista de canais
+     */
+    void removeCanal(shared_ptr<Canal> canal);
 
-    bool canalDuplicado(Canal *canal);
+    /*
+     * @brief Método que testa se um canal já existe no servidor. Faz distinção entre
+     * canais de texto e voz.
+     * @param canal Um ponteiro do Canal que será checado a existência da duplicata
+     * @return true se o Canal já existir; false se o canal não existir
+     */
+    bool canalDuplicado(shared_ptr<Canal> canal);
+
+    /* Lista os canais de um servidor, primeiro os de texto, seguidos pelos de voz */
+    void listarCanais();
+
+    /*
+     * @brief Procura um canal pelo seu nome.
+     * @param nome O nome do canal a ser procurado
+     * @return true, se o canal for encontrado e false, caso não seja encontrado
+     */
+    bool encontraCanal(const string nome);
+
+    /*
+     * @brief Adiciona uma nova mensagem a um Canal.
+     * @param nome O nome do canal ao qual a mensagem será adicionada
+     * @param mensagem A Mensagem que será enviada
+     */
+    void adicionaMensagem(const string nome, Mensagem mensagem);
+
+    /*
+     * @brief busca o Canal e lista suas mensagens.
+     * @param nome O nome do Canal o qual terá as mensagens listadas.
+     */
+    void listaMensagensCanal(const string nome);
 };
 
 #endif

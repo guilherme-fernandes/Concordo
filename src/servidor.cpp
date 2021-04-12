@@ -69,18 +69,18 @@ bool Servidor::testaDono(int ids) {
 void Servidor::listaParticipantes() {
 }
 
-void Servidor::adicionaCanal(Canal *canal) {
+void Servidor::adicionaCanal(shared_ptr<Canal> canal) {
     canais.push_back(canal);
 }
 
-void Servidor::removeCanal(Canal canal) {
+void Servidor::removeCanal(shared_ptr<Canal> canal) {
 }
 
-vector<Canal *> Servidor::getCanais() {
+vector<shared_ptr<Canal>> Servidor::getCanais() {
     return canais;
 }
 
-bool Servidor::canalDuplicado(Canal *canal) {
+bool Servidor::canalDuplicado(shared_ptr<Canal> canal) {
     auto it = canais.begin();
 
     if (canais.size() == 0) {
@@ -88,7 +88,7 @@ bool Servidor::canalDuplicado(Canal *canal) {
     }
 
     for (; it != canais.end(); ++it) {
-        Canal *canalit = *it;
+        shared_ptr<Canal> canalit = *it;
 
         if (canalit->retornaTipo() == 1 && canal->getNome() == canalit->getNome()) {
             return true;
@@ -98,23 +98,76 @@ bool Servidor::canalDuplicado(Canal *canal) {
             return true;
         }
 
-        else {
-            cout << "DEU RUIM" << endl;
-            return -1;
+        else if (canalit->retornaTipo() == 0) {
+            cout << "ERRO" << endl;
+            return false;
         }
-
-        /*
-        Canal *canalit = *it;
-        cout << "size de canais: " << canais.size() << endl;
-        if (dynamic_cast<CanalTexto *>(canalit) != nullptr && canal.getNome() == canalit->getNome()) {
-            return true;
-        }
-
-        else if (dynamic_cast<CanalVoz *>(canalit) != nullptr && canal.getNome() == canalit->getNome()) {
-            return true;
-        }
-        */
     }
 
     return false;
+}
+
+void Servidor::listarCanais() {
+    auto it = canais.begin();
+
+    cout << "#canais de texto" << endl;
+    for (; it != canais.end(); ++it) {
+        shared_ptr<Canal> canalit = *it;
+
+        if (canalit->retornaTipo() == 1) {
+            cout << canalit->getNome() << endl;
+        }
+    }
+
+    it = canais.begin();
+    cout << "#canais de voz" << endl;
+    for (; it != canais.end(); ++it) {
+        shared_ptr<Canal> canalit = *it;
+
+        if (canalit->retornaTipo() == 2) {
+            cout << canalit->getNome() << endl;
+        }
+    }
+}
+
+bool Servidor::encontraCanal(const string nome) {
+    auto it = canais.begin();
+
+    for (; it != canais.end(); ++it) {
+        shared_ptr<Canal> canalit = *it;
+
+        if (canalit->getNome() == nome) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Servidor::adicionaMensagem(const string nome, Mensagem mensagem) {
+    auto it = canais.begin();
+
+    for (; it != canais.end(); ++it) {
+        shared_ptr<Canal> canalit = *it;
+
+        if (canalit->getNome() == nome) {
+            canalit->armazenaMensagem(mensagem);
+            return;
+        }
+    }
+    cout << "Canal não encontrado" << endl;
+}
+
+void Servidor::listaMensagensCanal(const string nome) {
+    auto it = canais.begin();
+
+    for (; it != canais.end(); it++) {
+        shared_ptr<Canal> canalit = *it;
+
+        if (canalit->getNome() == nome) {
+            canalit->listaMensagens();
+            return;
+        }
+    }
+
+    cout << "Canal não encontrado" << endl;
 }

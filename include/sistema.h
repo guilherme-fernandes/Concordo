@@ -125,12 +125,55 @@ class Sistema {
      * esteja conectado a um servidor.
      */
     string list_participants();
+
+    /*
+     * @brief lista os canais de um servidor
+     * @return uma string vazia
+     */
     string list_channels();
+
+    /*
+     * @brief cria um novo Canal no sistema.
+     * @param nome Nome do novo Canal.
+     * @param tipo "texto", caso seja um Canal de Texto, "voz", caso seja Canal de Voz.
+     * @return Uma string com o status da operação.
+     */
     string create_channel(const string nome, const string tipo);
+
+    /*
+     * @brief entra em um Canal.
+     * @param nome O nome do Canal que vai ser conectado. Caso exista um canal de voz e 
+     * um canal de texto com o mesmo nome, ele vai entrar no que estiver primeiro no vector.
+     * @return Uma string com o status da operação
+     */
     string enter_channel(const string nome);
+
+    /*
+     * @brief Sai de um Canal conectado.
+     * @return Uma string com o status da operação.
+     */
     string leave_channel();
+
+    /*
+     * @brief Envia uma nova mensagem no Canal conectado
+     * @param mensagem O conteúdo da mensagem
+     * @return Uma string com o status da operação
+     */
     string send_message(const string mensagem);
+
+    /*
+     * @brief lista as mensagens de um Canal. Caso seja um Canal de Texto, imprime todas
+     * as mensagens. Caso seja um Canal de Voz, imprime apenas a última mensagem.
+     * @return Uma string vazia. 
+     */
     string list_messages();
+
+    /*
+     * @brief Método que retorna um ponteiro para um usuário, fornecendo o seu ID
+     * @param usuarioID O ID do usuário a ser encontrado
+     * @return Um ponteiro para um Usuário, ou nullptr caso o usuário não seja encontrado
+     */
+    Usuario* retornaUsuarioPorID(const int usuarioID);
 };
 
 #endif

@@ -29,7 +29,7 @@ Ou, pode criar um arquivo de texto com uma lista de comandos (um por linha) e ex
 
 ## Comandos
 
-Até o momento, os seguintes comandos podem ser executados:
+Os seguintes comandos podem ser executados no Concordo:
 
 O comando `create-user`, cria um novo usuário no Concordo, a partir dos dados informados. Não é permitido cadastrar dois usuários com o mesmo e-mail:
 
@@ -105,4 +105,38 @@ O comando `quit`  encerra o Concordo:
 quit
 ```
 
-**As funcionalidades da Parte 2 do projeto serão adicionadas a seguir.**
+O comando `create-channel` cria um novo canal no servidor atualmente conectado. O usuário deve dizer se é um canal de voz ou de texto.
+
+```
+create-channel [nome do canal] [tipo]
+```
+
+O comando `list-channels` lista os canais do servidor, diferenciando os de texto dos de voz.
+
+```
+list-channels
+```
+
+O comando `enter-channel` entra (visualiza) um canal do servidor. Neste caso, ele não faz distinção entre canais de texto e de voz, então caso existam dois canais, de texto e de voz com o mesmo nome, ele irá entrar no primeiro da lista.
+
+```
+enter-channel [nome do canal]
+```
+
+O comando `leave-channel` deixa de visualizar um canal conectado
+
+```
+leave-channel
+```
+
+O comando `send-message` envia uma mensagem quando está conectado a um canal.
+
+```
+send-message [conteúdo da mensagem]
+```
+
+O comando `list-messages` lista as mensagens de um canal. Como o canal de voz ainda não possui recursos de voz, ele apenas imprime a última mensagem enviada.
+
+```
+list-messages
+```

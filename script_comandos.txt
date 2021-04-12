@@ -52,9 +52,32 @@ enter-server servidor-sinistro
 list-participants
 disconnect
 login renan@imd.ufrn.br senha
+enter-server servidor-sinistro
 create-channel canaltexto-novo texto
 create-channel canalvoz-novo voz
-create-channel canalvoz-novo voz
+create-channel canaltexto-2 texto
+create-channel canalvoz-2 voz
+create-channel canalvoz-2 voz
+create-channel canaltexto-2 texto
+list-channels
+leave-channel
+leave-server
+disconnect
+login julio@imd.ufrn.br senha
+enter-server servidor-sinistro
+enter-channel canaltexto-novo
+send-message Oi pessoal, vamos conversar
+send-message Boa Tarde!
+list-messages
+leave-channel
+leave-server
+disconnect
+login renan@imd.ufrn.br senha
+enter-server servidor-sinistro
+enter-channel canalvoz-novo
+send-message Olá! Como você está?
+send-message Vamos TC!
+list-messages
 quit
 create-user naodeveprocessar@imd.ufrn.br 
 naodevechegaraqui Não deve chegar aqui

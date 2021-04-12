@@ -134,7 +134,7 @@ string Executor::processarLinha(string linha) {
     }
 
     else if (nomeComando == "enter-channel") {
-        string nome;
+        string nome, tipo;
         buf >> nome;
         return sistema->enter_channel(nome);
     }
